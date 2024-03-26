@@ -39,7 +39,7 @@
                                         <span class="fa fa-arrow-right text-white"/>
                                     </div>
                                 </div>
-                                <ChartRenderer type="'doughnut'" title="'Top Products Report'"/>
+                                <ChartRenderer type="'doughnut'" title="'Top Products Report'" config="state.topProducts"/>
                             </div>
                         </div>
 
@@ -51,7 +51,7 @@
                                         <span class="fa fa-arrow-right text-white"/>
                                     </div>
                                 </div>
-                                <ChartRenderer type="'pie'" title="'Top Sales People Report'"/>
+                                <ChartRenderer type="'pie'" title="'Top Sales People Report'" config="state.topSalesPeople"/>
                             </div>
                         </div>
                     </div>
@@ -68,7 +68,7 @@
                                         <span class="fa fa-arrow-right text-white"/>
                                     </div>
                                 </div>
-                                <ChartRenderer type="'bar'" title="'Monthly Sales Report'"/>
+                                <ChartRenderer type="'bar'" title="'Monthly Sales Report'" config="state.monthlySales"/>
                             </div>
                         </div>
                     </div>
@@ -82,7 +82,7 @@
                                         <span class="fa fa-arrow-right text-white"/>
                                     </div>
                                 </div>
-                                <ChartRenderer type="'line'" title="'Partner Orders Report'"/>
+                                <ChartRenderer type="'line'" title="'Partner Orders Report'" config="state.partnerOrders"/>
                             </div>
                         </div>
                     </div>

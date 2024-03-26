@@ -10,6 +10,49 @@ import { useService } from '@web/core/utils/hooks'
 import { Component, useSubEnv, useState, onWillStart } from "@odoo/owl";
 
 export class Sales_dashboard extends Component {
+
+    async getTopProducts(){
+
+        const data = await this.orm.readGroup("sale.report", [], ['product_id', 'price_total'], ['product_id'])
+        console.log(data, "jjj")
+        this.state.topProducts = {
+            data : {
+                labels: [
+                    'Red',
+                    'Blue',
+                    'Yellow'
+                ],
+                datasets: [
+                {
+                    label: 'My First Dataset',
+                    data: [300, 50, 100],
+                    hoverOffset: 4
+                },{
+                    label: 'My Second Dataset',
+                    data: [100, 70, 150],
+                    hoverOffset: 4
+                }]
+            }
+        }
+    }
+
+    getTopSalesPeople(){
+        this.state.topSalesPeople = {}
+        
+    }
+
+    getMonthlySales(){
+        this.state.monthlySales = {}
+
+    }
+
+    getPartnerOrders(){
+        this.state.partnerOrders = {}
+    }
+
+
+
+
     setup() {
         this.state = useState({
             quotations:{
@@ -25,6 +68,10 @@ export class Sales_dashboard extends Component {
             this.getDates()
             await this.getQuotations()
             await this.getOrders()
+            await this.getTopProducts()
+            this.getTopSalesPeople()
+            this.getMonthlySales()
+            this.getPartnerOrders()
         })
     }
 
