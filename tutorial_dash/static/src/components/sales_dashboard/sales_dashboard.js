@@ -5,49 +5,158 @@ import { Layout } from "@web/search/layout";
 import { KpiCard } from "../kpi_card/kpi_card"
 import { ChartRenderer } from "../chart_renderer/chart_renderer";
 import { getDefaultConfig } from "@web/views/view";
-import { useService } from '@web/core/utils/hooks'
+import { useService } from '@web/core/utils/hooks';
+import { getColor } from '@web/views/graph/colors';
 
 import { Component, useSubEnv, useState, onWillStart } from "@odoo/owl";
 
 export class Sales_dashboard extends Component {
 
     async getTopProducts(){
+        let domain = [['state', 'in', ['sale', 'done']]]
+        if (this.state.period > 0){
+            domain.push(['date','>', this.state.current_date])
+        }
 
-        const data = await this.orm.readGroup("sale.report", [], ['product_id', 'price_total'], ['product_id'])
-        console.log(data, "jjj")
+        const data = await this.orm.readGroup("sale.report", domain, ['product_id', 'price_total'], ['product_id'], {limit: 5, orderby: "price_total desc"})
         this.state.topProducts = {
             data : {
-                labels: [
-                    'Red',
-                    'Blue',
-                    'Yellow'
-                ],
+                labels: data.map(d => d.product_id[1]),
+                // [
+                //     'Red',
+                //     'Blue',
+                //     'Yellow'
+                // ],
                 datasets: [
                 {
-                    label: 'My First Dataset',
-                    data: [300, 50, 100],
-                    hoverOffset: 4
+                    label: 'Total',
+                    data: data.map(d => d.price_total),
+                    // [300, 50, 100],
+                    hoverOffset: 4,
+                    backgroundColor: data.map((_, index) => getColor(index)),
                 },{
-                    label: 'My Second Dataset',
-                    data: [100, 70, 150],
-                    hoverOffset: 4
+                    label: 'Count',
+                    data: data.map(d => d.product_id_count),
+                    // [100, 70, 150],
+                    hoverOffset: 4,
+                    backgroundColor: data.map((_, index) => getColor(index)),
                 }]
             }
         }
     }
 
-    getTopSalesPeople(){
-        this.state.topSalesPeople = {}
+    async getTopSalesPeople(){
+
+        let domain = [['state', 'in', ['sale', 'done']]]
+        if (this.state.period > 0){
+            domain.push(['date','>', this.state.current_date])
+        }
+
+        const data = await this.orm.readGroup("sale.report", domain, ['user_id', 'price_total'], ['user_id'], {limit: 5, orderby: "price_total desc"})
+        this.state.topSalesPeople = {
+            data : {
+                labels: data.map(d => d.user_id[1]),
+                // [
+                //     'Red',
+                //     'Blue',
+                //     'Yellow'
+                // ],
+                datasets: [
+                {
+                    label: 'Total',
+                    data: data.map(d => d.price_total),
+                    // [300, 50, 100],
+                    hoverOffset: 4,
+                    backgroundColor: data.map((_, index) => getColor(index)),
+                }
+            ]
+            }
+        }
         
     }
 
-    getMonthlySales(){
-        this.state.monthlySales = {}
+    async getMonthlySales(){
+        let domain = [['state', 'in', ['draft','sent','sale', 'done']]]
+        if (this.state.period > 0){
+            domain.push(['date','>', this.state.current_date])
+        }
+
+        const data = await this.orm.readGroup("sale.report", domain, ['date', 'state', 'price_total'], ['date', 'state'], {orderby: "date", lazy: false})
+        this.state.monthlySales = {
+            data : {
+                labels: [... new Set(data.map(d => d.date))],
+                // [
+                //     'Red',
+                //     'Blue',
+                //     'Yellow'
+                // ],
+                datasets: [
+                {
+                    label: 'Quotations',
+                    data: data.filter(d => d.state == 'draft' || d.state == 'sent').map(d => d.price_total),
+                    // [300, 50, 100],
+                    hoverOffset: 4,
+                    backgroundColor: "red",
+                    // backgroundColor: data.map((_, index) => getColor(index)),
+                },{
+                    label: 'Count',
+                    data: data.filter(d => ['sale', 'done'].includes(d.state)).map(d => d.price_total),
+                    // [100, 70, 150],
+                    hoverOffset: 4,
+                    backgroundColor: "green"
+                }]
+            }
+        }
 
     }
 
-    getPartnerOrders(){
-        this.state.partnerOrders = {}
+    async getPartnerOrders(){
+
+        let domain = [['state', 'in', ['draft','sent','sale', 'done']]]
+        if (this.state.period > 0){
+            domain.push(['date','>', this.state.current_date])
+        }
+
+        const data = await this.orm.readGroup("sale.report", domain, ['partner_id', 'price_total', 'product_uom_qty'], ['partner_id'], {orderby: "partner_id", lazy: false})
+        console.log(data, "jjjccc")
+        this.state.partnerOrders = {
+            data : {
+                labels: data.map(d => d.partner_id[1]),
+                // [
+                //     'Red',
+                //     'Blue',
+                //     'Yellow'
+                // ],
+                datasets: [
+                {
+                    label: 'Total Amount',
+                    data: data.map(d => d.price_total),
+                    // [300, 50, 100],
+                    hoverOffset: 4,
+                    backgroundColor: "orange",
+                    yAxisID: "Total",
+                    order: 1
+                    // backgroundColor: data.map((_, index) => getColor(index)),
+                },{
+                    label: 'Ordered Qty',
+                    data: data.map(d => d.product_uom_qty),
+                    // [100, 70, 150],
+                    hoverOffset: 4,
+                    backgroundColor: "blue",
+                    type:"line",
+                    borderColor: "blue",
+                    yAxisID: "Qty",
+                    order: 0
+
+                }]
+            },
+            scales: {
+                Qty: {
+                    position: 'right',
+
+                }
+            }
+        }
     }
 
 
@@ -69,9 +178,9 @@ export class Sales_dashboard extends Component {
             await this.getQuotations()
             await this.getOrders()
             await this.getTopProducts()
-            this.getTopSalesPeople()
-            this.getMonthlySales()
-            this.getPartnerOrders()
+            await this.getTopSalesPeople()
+            await this.getMonthlySales()
+            await this.getPartnerOrders()
         })
     }
 

@@ -82,7 +82,7 @@
                                         <span class="fa fa-arrow-right text-white"/>
                                     </div>
                                 </div>
-                                <ChartRenderer type="'line'" title="'Partner Orders Report'" config="state.partnerOrders"/>
+                                <ChartRenderer type="'bar'" title="'Partner Orders Report'" config="state.partnerOrders"/>
                             </div>
                         </div>
                     </div>

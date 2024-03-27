@@ -19,24 +19,11 @@ export class ChartRenderer extends Component {
         {
           type: this.props.type,
           data: this.props.config.data,
-          // {
-          //   labels: [
-          //       'Red',
-          //       'Blue',
-          //       'Yellow'
-          //     ],
-          //     datasets: [
-          //     {
-          //       label: 'My First Dataset',
-          //       data: [300, 50, 100],
-          //       hoverOffset: 4
-          //     },{
-          //       label: 'My Second Dataset',
-          //       data: [100, 70, 150],
-          //       hoverOffset: 4
-          //     }]
-          // },
           options: {
+            // onclick: (e) => {
+            //   const active = e.chart.getActiveElements()
+            //   const label = e.chart.data.labels[active[o]]
+            // },
             responsive: true,
             plugins: {
               legend: {
@@ -47,7 +34,8 @@ export class ChartRenderer extends Component {
                 text: this.props.title,
                 position: 'bottom',
               }
-            }
+            },
+            scales: 'scales' in this.props.config ? this.props.config.scales : {}, 
           },
         }
       );
